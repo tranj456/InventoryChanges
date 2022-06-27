@@ -1,1 +1,1 @@
-import couchsurf
+from .couchsurf import *

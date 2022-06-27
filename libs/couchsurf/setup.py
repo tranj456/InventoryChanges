@@ -1,11 +1,10 @@
 import setuptools
 
-packages = setuptools.find_packages(where='./src')
-
 setuptools.setup(
-    name="CouchSurf",
+    name="couchsurf",
     version="0.1",
-    packages=packages,
+    packages=['couchsurf'],
+    package_dir={'couchsurf': 'src'},
     include_package_data=True,
     description='Limited API for basic CouchDB operations.',
     long_description=open('README.md', 'r').read(),
