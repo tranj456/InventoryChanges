@@ -7,10 +7,11 @@ sys.path.append(
 
 class Spec:
 
-  def use(self):
-    pass
+  def use(self) -> None:
+    print("You try it, but it doesn't do anything.")
+    return None
 
-class Ops:
+class items:
 
   import types
 
