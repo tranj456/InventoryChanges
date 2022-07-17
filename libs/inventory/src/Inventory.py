@@ -1,33 +1,60 @@
 import os
 import json
+import sys
 
 from .Item import Spec
 
-class Inventory:
+PATH = '~/.inv/.registry' # TODO: convert to configuration variable
 
-  PATH = '~/.inv/.registry'
+class list:
+
+  # File operations
 
   def __init__(self):
-    self.inventory = self.open_inv("r+")
+    self.inventory = {}
+    try:
+      fh = open(
+        os.path.expanduser(PATH),
+        "r+"
+      )
+      self.inventory = json.load(fh)
+      fh.close()
+    except: pass
 
-  def open_inv(self, mode: str) -> dict:
-    fh = open(
+  def write(self) -> None:
+    self.empties()
+    with open(
       os.path.expanduser(PATH),
-      mode
-    )
-    try:
-      return json.load(fh)
-    except:
-      return {}
+      "w"
+    ) as fh:
+      json.dump(self.inventory, fh)
 
-  def write_inv(self, mode: str = "w+") -> None:
-    pass
+  # Representation
 
-  def add_item(self, item: str) -> None:
-    try:
-      self.inventory[item]["qty"] += 1
-    except:
+  def __str__(self) -> str:
+    return json.dumps(self.inventory)
+
+  # Add/remove items
+
+  def add(self, item: str, number: int = 1) -> None:
+    if item in self.inventory:
+      self.inventory[item]["quantity"] += number
+    else:
       self.inventory[item] = {
-        "qty": 1,
-        "traits": {}
+        "quantity": number,
+        "filename": f"{item}.py"
       }
+    self.write()
+
+  def remove(self, item: str, number: int = 1) -> None:
+    self.add(item, -1 * number)
+
+  # Automatically remove empty or negative quantity items
+
+  def empties(self) -> None:
+    for item in self.inventory:
+      if self.inventory[item]["quantity"] <= 0:
+        del self.inventory[item]
+
+if __name__ == "__main__":
+  exit()
