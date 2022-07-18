@@ -88,10 +88,14 @@ class Items:
     except (KeyError, OutOfError) as e:
       print(f"You have no {item} remaining!")
       return
-    object = import_module(f"{item}")
+    try:
+      object = import_module(f"{item}")
+    except ModuleNotFoundError:
+      print(f"You don't seem to have any {item}.")
+      return
     instance = getattr(object, item)()
     if(instance.consumable):
-      list.remove("Box")
+      list.remove(item)
       os.remove(
         os.path.expanduser(
           f'~/.inv/{item}.py'
