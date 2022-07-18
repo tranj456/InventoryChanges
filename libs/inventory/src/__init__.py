@@ -1,9 +1,16 @@
+import os
 import sys
+import json
 
 from .Item import *
 from .Inventory import *
 
 args = sys.argv[1:]
+path = '~/.inv'
+
+if len(args) > 1:
+  print("Acquire only one item at a time!")
+  exit()
 
 if args:
   import importlib
@@ -21,7 +28,19 @@ if args:
       raise
     importlib.import_module(name)
   except:
-    print("Not a Python file.")
+    print("Not a valid item file.")
     exit()
 
-  shutil.copy(file, f"~/.inv/{file}")
+  try:
+    obj_path = os.path.expanduser(
+      f"{path}/{file}"
+    )
+    shutil.copy(file, obj_path)
+  except:
+    print(f"Error acquiring {file}.")
+
+  try:
+    list = Inventory.List()
+    list.add(name)
+  except:
+    exit()
