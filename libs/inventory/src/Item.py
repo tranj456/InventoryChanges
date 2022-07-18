@@ -13,24 +13,11 @@ class Spec:
     print("You try it, but it doesn't do anything.")
     return None
 
-class items:
+class OutOfError(Exception):
 
-  import types
+  def __init__(self, item:str, *args):
+    super().__init__(args)
+    self.item = item
 
-  def __init__(self, list):
-    self.list = list.list()
-    print(self.list)
-
-  @staticmethod
-  def use(item: str):
-    # TODO: Search inventory dictionary instead
-    import importlib
-    object = importlib.import_module(f"{item}")
-    instance = getattr(object, item)()
-    if(instance.consumable):
-      os.remove(
-        os.path.expanduser(
-          f'~/.inv/{item}.py'
-        )
-      )
-    return instance.use()
+  def __str__(self):
+    return f"You don't have any {self.item} left to use!"
