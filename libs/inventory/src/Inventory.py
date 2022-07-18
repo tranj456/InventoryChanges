@@ -11,6 +11,16 @@ sys.path.append(
   os.path.expanduser('~/.inv/')
 )
 
+class Acquire:
+
+  def __init__(self, filename):
+    import shutil
+    list = List()
+
+  @staticmethod
+  def check(filename):
+    pass
+
 class List:
 
   # File operations
@@ -97,6 +107,3 @@ class Items:
 
 list = List()
 items = Items(list)
-
-if __name__ == "__main__":
-  exit()

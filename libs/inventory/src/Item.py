@@ -17,7 +17,3 @@ class OutOfError(Exception):
 
   def __init__(self, item:str, *args):
     super().__init__(args)
-    self.item = item
-
-  def __str__(self):
-    return f"You don't have any {self.item} left to use!"
