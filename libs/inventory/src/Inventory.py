@@ -2,13 +2,15 @@ import os
 import json
 import sys
 
-from .Item import Spec
+from .Config import *
+
+from .Item import ItemSpec
 from .Item import OutOfError
 
-PATH = '~/.inv/.registry' # TODO: convert to configuration variable
+PATH = f'{Config.values["INV_PATH"]}/{Config.values["INV_REGISTRY"]}'
 
 sys.path.append(
-  os.path.expanduser('~/.inv/')
+  os.path.expanduser(f'{Config.values["INV_PATH"]}')
 )
 
 class Acquire:
@@ -98,7 +100,7 @@ class Items:
       list.remove(item)
       os.remove(
         os.path.expanduser(
-          f'~/.inv/{item}.py'
+          f'{Config.values["INV_PATH"]}/{item}.py'
         )
       )
     return instance.use()

@@ -2,11 +2,12 @@ import os
 import sys
 import json
 
+from .Config import *
 from .Item import *
 from .Inventory import *
 
 args = sys.argv[1:]
-path = '~/.inv'
+path = Config.values["INV_PATH"]
 
 if len(args) > 1:
   print("Acquire only one item at a time!")
@@ -33,7 +34,7 @@ if args:
 
   try:
     obj_path = os.path.expanduser(
-      f"{path}/{file}"
+      f'{config.values["INV_PATH"]}/{file}'
     )
     shutil.copy(file, obj_path)
   except:

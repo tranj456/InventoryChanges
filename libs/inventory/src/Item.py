@@ -1,17 +1,26 @@
 import os
 import sys
 
+from .Config import *
+
 sys.path.append(
-  os.path.expanduser('~/.inv/')
+  os.path.expanduser(f'{Config.values["INV_PATH"]}')
 )
 
-class Spec:
+class ItemSpec:
 
   consumable = True
 
   def use(self) -> None:
     print("You try it, but it doesn't do anything.")
     return None
+
+class FixtureSpec(ItemSpec):
+
+  consumable = False
+
+  def __init__(self):
+    pass
 
 class OutOfError(Exception):
 
