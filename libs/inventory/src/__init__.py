@@ -41,7 +41,7 @@ if args:
     print(f"Error acquiring {file}.")
 
   try:
-    list = Inventory.List()
+    list = Inventory.list
     list.add(name)
   except:
     exit()
