@@ -5,7 +5,7 @@ class Question:
     self.prompt = prompt["question"]
     for response in prompt["responses"]:
       self.set_opt(response)
-    options = [self.responses[val]["choice"] for val in self.responses]
+    options = [self.responses[val].choice for val in self.responses]
     self.prompt += f" ({'/'.join(options)}): "
 
   def is_key(self, char: str) -> bool:
@@ -18,10 +18,7 @@ class Question:
     for letter in choice:
       if not self.is_key(letter):
         opt = Option(letter, option)
-        self.responses[letter] = {
-          "choice": opt.choice,
-          "outcome": opt.outcome
-        }
+        self.responses[letter] = opt
         break
 
 class Option:

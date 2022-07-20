@@ -16,7 +16,8 @@ q = narrator.Question(
 while True:
   ask = input(q.prompt)
   if ask in q.responses:
-    n.path.change_path(int(q.responses[ask]))
+    path = q.responses[ask].outcome
+    n.path.change_path(path)
     break
   print("Not an option; try again")
 
