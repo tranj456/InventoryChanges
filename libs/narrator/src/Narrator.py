@@ -1,16 +1,17 @@
 import yaml
 from time import sleep
 
-# Syntax narrator.path().next_scene()
+from .Path import Path
 
 class Narrator:
 
   def __init__(self):
-    fh = open(".paths.yaml")
+    fh = open(".paths.yml")
     self.paths = yaml.safe_load(fh)
-    self.current_path = 0
+    self.path = Path()
 
-  def path(self):
-    def next_scene(self):
-      pass
-    pass
+  def narrate(self):
+    lines = self.paths[self.path.number][self.path.scene]
+    for line in lines:
+      print(line)
+      sleep(1)

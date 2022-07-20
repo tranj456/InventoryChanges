@@ -7,3 +7,4 @@ def exists(filepaths: list) -> bool:
     if not os.path.exists(file):
       return False
   return True
+
