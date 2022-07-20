@@ -2,4 +2,6 @@ from dotenv import dotenv_values
 
 class Config:
 
-  values = dotenv_values('.env')
+  values = {}
+  values["INV_PATH"] = "~/.inv"
+  values["INV_REGISTRY"] = ".registry"
