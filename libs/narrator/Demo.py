@@ -1,6 +1,7 @@
 import narrator
 
 n = narrator.Narrator()
+
 n.narrate()
 
 q = narrator.Question(
@@ -17,8 +18,8 @@ while True:
   ask = input(q.prompt)
   if ask in q.responses:
     path = q.responses[ask].outcome
-    n.path.change_path(path)
+    n.path.change(path)
     break
   print("Not an option; try again")
 
-n.narrate()
+n.narrate(all=True)
