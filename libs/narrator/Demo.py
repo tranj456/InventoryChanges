@@ -8,8 +8,8 @@ q = narrator.Question(
   {
     "question": "Skip, er nah",
     "responses": [
-      {"choice": "skip", "outcome": 2},
-      {"choice": "nah", "outcome": 1}
+      {"choice": "skip", "outcome": 2.1},
+      {"choice": "nah", "outcome": 1.0}
     ]
   }
 )
@@ -22,4 +22,5 @@ while True:
     break
   print("Not an option; try again")
 
-n.narrate(all=True)
+#n.narrate(all=True)
+n.narrate()
