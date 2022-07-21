@@ -9,7 +9,8 @@ class Path:
   def next_scene(self):
     self.scene += 1
 
-  def change(self, outcome: float = 0):
-    path, scene = str(outcome).split(".")
+  def change(self, outcome: float):
+    outcome = str(float(outcome))
+    path, scene = outcome.split(".")
     self.number = int(path)
     self.scene = int(scene)

@@ -11,7 +11,7 @@ def exists(filepaths: list) -> bool:
 
 def set_flag(flag: str, val:int = 1) -> None:
   flags = {}
-  if not exists(".flags"):
+  if not exists([".flags"]):
     with open(".flags", "w+") as fh:
       fh.write("{}")
   with open(".flags", "r+") as fh:

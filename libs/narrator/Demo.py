@@ -8,7 +8,7 @@ q = narrator.Question(
   {
     "question": "Skip, er nah",
     "responses": [
-      {"choice": "skip", "outcome": 2.1},
+      {"choice": "skip", "outcome": 2},
       {"choice": "nah", "outcome": 1.0}
     ]
   }
