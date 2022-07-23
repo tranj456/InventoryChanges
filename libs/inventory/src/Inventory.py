@@ -1,6 +1,6 @@
 import os
-import json
 import sys
+import json
 
 from .Config import *
 
@@ -17,11 +17,34 @@ class Acquire:
 
   def __init__(self, filename):
     import shutil
-    list = List()
+    import importlib
+    self.filename = filename
 
-  @staticmethod
-  def check(filename):
-    pass
+  def validate(self):
+    try:
+      self.name, self.ext = self.filename.split(".")
+      if not self.ext == "py":
+        raise
+      importlib.import_module(self.name)
+    except:
+      print("Not a valid item file")
+      exit()
+
+  def move(self):
+    try:
+      path = os.path.expanduser(
+        f'{Config.values["INV_PATH"]}/{file}'
+      )
+      shutil.copy(self.filename, path)
+    except:
+      print(f"Couldn't acquire {self.name}")
+
+  def add(self):
+    try:
+      .list.add(self.name)
+    except:
+      print(f"Couldn't acquire {self.name}")
+      exit()
 
 class List:
 
