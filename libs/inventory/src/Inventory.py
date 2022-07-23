@@ -15,34 +15,41 @@ sys.path.append(
 
 class Acquire:
 
+  import shutil
+  import importlib
+
   def __init__(self, filename):
-    import shutil
-    import importlib
     self.filename = filename
+    self.validate()
+    self.move()
+    self.add()
 
   def validate(self):
+    import importlib
     try:
       self.name, self.ext = self.filename.split(".")
       if not self.ext == "py":
         raise
       importlib.import_module(self.name)
-    except:
+    except Exception as e:
       print("Not a valid item file")
       exit()
 
   def move(self):
+    import shutil
     try:
       path = os.path.expanduser(
-        f'{Config.values["INV_PATH"]}/{file}'
+        f'{Config.values["INV_PATH"]}/{self.filename}'
       )
       shutil.copy(self.filename, path)
-    except:
+    except Exception as e:
       print(f"Couldn't acquire {self.name}")
+      exit()
 
   def add(self):
     try:
-      .list.add(self.name)
-    except:
+      list.add(self.name)
+    except Exception as e:
       print(f"Couldn't acquire {self.name}")
       exit()
 
