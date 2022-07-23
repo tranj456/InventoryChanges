@@ -24,17 +24,19 @@ if args:
   #       specific errors
 
   try:
+    print(args[0])
     name, ext = file.split(".")
     if not ext == "py":
       raise
     importlib.import_module(name)
-  except:
+  except Exception as e:
+    print(e)
     print("Not a valid item file.")
     exit()
 
   try:
     obj_path = os.path.expanduser(
-      f'{config.values["INV_PATH"]}/{file}'
+      f'{Config.values["INV_PATH"]}/{file}'
     )
     shutil.copy(file, obj_path)
   except:
