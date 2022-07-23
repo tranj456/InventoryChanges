@@ -21,6 +21,26 @@ class Question:
         self.responses[letter] = opt
         break
 
+  def ask(self) -> float:
+    while True:
+      ask = input(self.prompt)
+      if ask in self.responses:
+        path = self.responses[ask].outcome
+        return path
+      print("Enter a valid response option.")
+
+class YesNoQuestion(Question):
+
+  def __init__(self, prompt: dict):
+    if len(prompt["responses"]) != 2: raise
+    super().__init__({
+      "question": prompt["question"],
+      "responses": [
+        {"choice": "yes", "outcome": prompt["responses"][0]},
+        {"choice": "no", "outcome": prompt["responses"][1]}
+      ]
+    })
+
 class Option:
 
   def __init__(self, key: str, option: dict):
