@@ -32,12 +32,12 @@ class Question:
 class YesNoQuestion(Question):
 
   def __init__(self, prompt: dict):
-    if len(prompt["responses"]) != 2: raise
+    if len(prompt["outcomes"]) != 2: raise
     super().__init__({
       "question": prompt["question"],
       "responses": [
-        {"choice": "yes", "outcome": prompt["responses"][0]},
-        {"choice": "no", "outcome": prompt["responses"][1]}
+        {"choice": "yes", "outcome": prompt["outcomes"][0]},
+        {"choice": "no", "outcome": prompt["outcomes"][1]}
       ]
     })
 

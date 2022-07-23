@@ -20,7 +20,7 @@ n.path.change(q.ask())
 n.narrate()
 
 q = narrator.YesNoQuestion(
-  {"question":"Yes or no?","responses":[0,1]}
+  {"question":"Yes or no?","outcomes":[0,1]}
 )
 
 n.path.change(q.ask())
