@@ -26,3 +26,8 @@ class OutOfError(Exception):
 
   def __init__(self, item:str, *args):
     super().__init__(args)
+
+class IsFixture(Exception):
+
+  def __init__(self, item:str, *args):
+    super().__init__(args)

@@ -5,7 +5,9 @@ import json
 from .Config import *
 
 from .Item import ItemSpec
+from .Item import FixtureSpec
 from .Item import OutOfError
+from .Item import IsFixture
 
 PATH = f'{Config.values["INV_PATH"]}/{Config.values["INV_REGISTRY"]}'
 
@@ -111,21 +113,37 @@ class Items:
   def __init__(self, list):
     self.list = list.inventory
 
+  def is_fixture(self, object) -> bool:
+    return "FixtureSpec" in dir(object)
+
   def use(self, item: str):
     from importlib import import_module
+
     try:
+      object = import_module(f"{item}")
+    except ModuleNotFoundError:
+      print(f"You don't seem to have any {item}.")
+      return
+
+    try:
+      fixture = self.is_fixture(object)
+      if fixture:
+        raise IsFixture(item)
       number = self.list[item]["quantity"]
       if number <= 0:
         raise OutOfError(item)
     except (KeyError, OutOfError) as e:
       print(f"You have no {item} remaining!")
       return
+    except IsFixture as e:
+      pass
+
     try:
-      object = import_module(f"{item}")
-    except ModuleNotFoundError:
-      print(f"You don't seem to have any {item}.")
+      instance = getattr(object, item)()
+    except:
+      print(f"{item} doesn't seem to be a valid object.")
       return
-    instance = getattr(object, item)()
+
     if(instance.consumable):
       list.remove(item)
       os.remove(
@@ -133,7 +151,9 @@ class Items:
           f'{Config.values["INV_PATH"]}/{item}.py'
         )
       )
-    return instance.use()
+    instance.use()
+    print(f"{instance}")
+    return f"{instance}"
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this
