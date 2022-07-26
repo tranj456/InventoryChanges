@@ -113,20 +113,20 @@ class Items:
   def __init__(self, list):
     self.list = list.inventory
 
-  def is_fixture(self, object) -> bool:
-    return "FixtureSpec" in dir(object)
+  def is_fixture(self, item) -> bool:
+    return "FixtureSpec" in dir(item)
 
   def use(self, item: str):
     from importlib import import_module
 
     try:
-      object = import_module(f"{item}")
+      item_file = import_module(f"{item}")
     except ModuleNotFoundError:
       print(f"You don't seem to have any {item}.")
       return
 
     try:
-      fixture = self.is_fixture(object)
+      fixture = self.is_fixture(item_file)
       if fixture:
         raise IsFixture(item)
       number = self.list[item]["quantity"]
@@ -139,7 +139,7 @@ class Items:
       pass
 
     try:
-      instance = getattr(object, item)()
+      instance = getattr(item_file, item)()
     except:
       print(f"{item} doesn't seem to be a valid object.")
       return
@@ -151,9 +151,12 @@ class Items:
           f'{Config.values["INV_PATH"]}/{item}.py'
         )
       )
-    instance.use()
-    print(f"{instance}")
-    return f"{instance}"
+
+    if type(instance).__str__ is not object.__str__:
+      instance.use()
+      print(f"{instance}")
+    else:
+      return instance.use()
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this
