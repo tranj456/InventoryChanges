@@ -1,5 +1,6 @@
 import os
 import sys
+import inspect
 
 from .Config import *
 
@@ -21,6 +22,36 @@ class FixtureSpec(ItemSpec):
 
   def __init__(self):
     pass
+
+class Factory:
+
+  def __init__(self, name):
+    self.name = name.title().replace(" ","")
+    self.imports = "from inventory.Item import ItemSpec"
+    self.globals = "consumable = True"
+    self.constructor = self.make()
+    self.methods = inspect.getsource(ItemSpec.use)
+    self.assemble()
+
+  def make(self) -> str:
+    code = inspect.getsource(Template)
+    return code.replace("Template", self.name)
+
+  def assemble(self):
+    elements = [
+      self.imports,
+      self.globals,
+      self.constructor,
+      self.methods
+    ]
+    with open(f"{self.name}.py", "w") as fh:
+      for elem in elements:
+        fh.write(f"{elem}\n\n")
+
+class Template(ItemSpec):
+
+  def __init__(self):
+    super().__init__()
 
 class OutOfError(Exception):
 
