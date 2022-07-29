@@ -3,6 +3,7 @@ import sys
 import inspect
 
 from .Config import *
+from .Template import Template
 
 sys.path.append(
   os.path.expanduser(f'{Config.values["INV_PATH"]}')
@@ -13,7 +14,7 @@ class ItemSpec:
   consumable = True
 
   def use(self) -> None:
-    print("You try it, but it doesn't do anything.")
+    print(f"You try the {self.__module__}, but it doesn't do anything.")
     return None
 
 class FixtureSpec(ItemSpec):
@@ -27,31 +28,19 @@ class Factory:
 
   def __init__(self, name):
     self.name = name.title().replace(" ","")
-    self.imports = "from inventory.Item import ItemSpec"
-    self.globals = "consumable = True"
-    self.constructor = self.make()
-    self.methods = inspect.getsource(ItemSpec.use)
-    self.assemble()
+    self.file = '\n\n'.join([
+      "from inventory.Item import ItemSpec",
+      inspect.getsource(Template)
+    ])
+    self.make()
 
-  def make(self) -> str:
-    code = inspect.getsource(Template)
-    return code.replace("Template", self.name)
-
-  def assemble(self):
-    elements = [
-      self.imports,
-      self.globals,
-      self.constructor,
-      self.methods
-    ]
+  def make(self):
+    self.file = self.file.replace(
+      "Template", 
+      f"{self.name}(ItemSpec)"
+    )
     with open(f"{self.name}.py", "w") as fh:
-      for elem in elements:
-        fh.write(f"{elem}\n\n")
-
-class Template(ItemSpec):
-
-  def __init__(self):
-    super().__init__()
+      fh.write(self.file)
 
 class OutOfError(Exception):
 
