@@ -26,8 +26,9 @@ class FixtureSpec(ItemSpec):
 
 class Factory:
 
-  def __init__(self, name):
+  def __init__(self, name, path: str = ""):
     self.name = name.title().replace(" ","")
+    self.path = path
     self.file = '\n\n'.join([
       "from inventory.Item import ItemSpec",
       inspect.getsource(Template)
@@ -36,10 +37,11 @@ class Factory:
 
   def make(self):
     self.file = self.file.replace(
-      "Template", 
+      "Template",
       f"{self.name}(ItemSpec)"
     )
-    with open(f"{self.name}.py", "w") as fh:
+    filepath = os.path.join(self.path, f"{self.name}.py")
+    with open(filepath, "w") as fh:
       fh.write(self.file)
 
 class OutOfError(Exception):
