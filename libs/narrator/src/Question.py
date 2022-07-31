@@ -26,6 +26,7 @@ class Question:
       ask = input(self.prompt)
       if ask in self.responses:
         path = self.responses[ask].outcome
+        self.choice = self.responses[ask].nice_name
         return path
       print("Enter a valid response option.")
 
@@ -50,4 +51,5 @@ class Option:
       1
     )
     self.outcome = option["outcome"]
+    self.nice_name = option["choice"].lower()
 
