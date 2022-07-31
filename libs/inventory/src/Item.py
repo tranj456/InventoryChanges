@@ -21,8 +21,9 @@ class FixtureSpec(ItemSpec):
 
   consumable = False
 
-  def __init__(self):
-    pass
+class BoxSpec(ItemSpec):
+
+  consumable = True
 
 class Factory:
 

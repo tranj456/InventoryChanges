@@ -6,6 +6,7 @@ from .Config import *
 
 from .Item import ItemSpec
 from .Item import FixtureSpec
+from .Item import BoxSpec
 from .Item import OutOfError
 from .Item import IsFixture
 
@@ -26,13 +27,18 @@ class Acquire:
     self.move()
     self.add()
 
+  def is_box(self, item) -> bool:
+    self.box = "BoxSpec" in dir(item)
+
   def validate(self):
     import importlib
     try:
       self.name, self.ext = self.filename.split(".")
       if not self.ext == "py":
         raise
-      importlib.import_module(self.name)
+      obj = importlib.import_module(self.name)
+      getattr(obj, self.name)().use
+      self.is_box(obj)
     except Exception as e:
       print("Not a valid item file")
       exit()
@@ -43,7 +49,8 @@ class Acquire:
       path = os.path.expanduser(
         f'{Config.values["INV_PATH"]}/{self.filename}'
       )
-      shutil.copy(self.filename, path)
+      if not self.box:
+        shutil.copy(self.filename, path)
     except Exception as e:
       print(f"Couldn't acquire {self.name}")
       exit()
@@ -116,6 +123,9 @@ class Items:
   def is_fixture(self, item) -> bool:
     return "FixtureSpec" in dir(item)
 
+  def is_box(self, item) -> bool:
+    return "BoxSpec" in dir(item)
+
   def use(self, item: str):
     from importlib import import_module
 
@@ -128,6 +138,9 @@ class Items:
     try:
       fixture = self.is_fixture(item_file)
       if fixture:
+        raise IsFixture(item)
+      box = self.is_box(item_file)
+      if box:
         raise IsFixture(item)
       number = self.list[item]["quantity"]
       if number <= 0:
@@ -144,12 +157,17 @@ class Items:
       print(f"{item} doesn't seem to be a valid object.")
       return
 
-    if(instance.consumable):
+    if(instance.consumable and not box):
       list.remove(item)
       os.remove(
         os.path.expanduser(
           f'{Config.values["INV_PATH"]}/{item}.py'
         )
+      )
+
+    if(box):
+      os.remove(
+        item_file.__file__
       )
 
     if type(instance).__str__ is not object.__str__:
