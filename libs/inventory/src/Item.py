@@ -24,6 +24,11 @@ class ItemSpec:
       if re.match(r"^-{1,2}", arg):
         arg = arg.replace("-","")
         self.actions[arg] = val
+    self.vars()
+
+  def vars(self) -> None:
+    for arg in self.actions:
+      setattr(self, arg, self.actions[arg])
 
   def use(self, **kwargs) -> None:
     print(f"You try the {self.__module__}, but it doesn't do anything.")
