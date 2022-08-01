@@ -139,7 +139,6 @@ class Items:
     # Set up properties and potential kwargs
     box = False
     fixture = False
-    args = sys.argv[2:]
 
     # Verify that item is in path or inventory
     try:
@@ -150,11 +149,9 @@ class Items:
 
     # Test type of item; remove if ItemSpec
     try:
-      fixture = self.is_fixture(item_file)
-      if fixture:
-        raise IsFixture(item)
       box = self.is_box(item_file)
-      if box:
+      fixture = self.is_fixture(item_file)
+      if fixture or box:
         raise IsFixture(item)
       number = self.list[item]["quantity"]
       if number <= 0:
@@ -162,8 +159,7 @@ class Items:
     except (KeyError, OutOfError) as e:
       print(f"You have no {item} remaining!")
       return
-    except IsFixture as e:
-      pass
+    except IsFixture as e: pass
 
     # Reflect the class
     try:
@@ -173,25 +169,20 @@ class Items:
       return
 
     # To or not to remove; that is the question
-    if(instance.consumable and not box):
-      list.remove(item)
-      os.remove(
-        os.path.expanduser(
-          f'{Config.values["INV_PATH"]}/{item}.py'
-        )
-      )
-
-    if(box):
+    if instance.consumable:
+      try:
+        list.remove(item)
+      except: pass
       os.remove(
         item_file.__file__
       )
 
     # Return the result or inbuilt use method
     if type(instance).__str__ is not object.__str__:
-      instance.use(args)
+      instance.use(**instance.actions)
       print(f"{instance}")
     else:
-      return instance.use(args)
+      return instance.use(**instance.actions)
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this

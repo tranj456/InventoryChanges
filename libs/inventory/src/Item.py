@@ -1,10 +1,13 @@
 import os
+import re
 import sys
 import gitit
 import inspect
+import argparse
 
 from .Config import *
 from .Template import Template
+from itertools import combinations
 
 sys.path.append(
   os.path.expanduser(f'{Config.values["INV_PATH"]}')
@@ -13,24 +16,42 @@ sys.path.append(
 class ItemSpec:
 
   consumable = True
+  actions = { }
 
-  def use(self, args) -> None:
+  def __init__(self):
+    pairs = combinations(sys.argv[2:], 2)
+    for arg, val in pairs:
+      if re.match(r"^-{1,2}", arg):
+        arg = arg.replace("-","")
+        self.actions[arg] = val
+    self.vars()
+
+  def vars(self) -> None:
+    for arg in self.actions:
+      setattr(self, arg, self.actions[arg])
+
+  def use(self, **kwargs) -> None:
     print(f"You try the {self.__module__}, but it doesn't do anything.")
-    return None
 
 class FixtureSpec(ItemSpec):
 
   consumable = False
 
+  def __init__(self):
+    super().__init__()
+
 class BoxSpec(ItemSpec):
 
   consumable = True
 
-  def use(self, args):
-    if args[0] == "pack":
+  def __init__(self):
+    super().__init__()
+
+  def use(self, **kwargs) -> None:
+    if action == "pack":
       return
-    if args[0] == "unpack":
-      gitit.get(file_name=args[1])
+    if action == "unpack":
+      return
 
 class Factory:
 
