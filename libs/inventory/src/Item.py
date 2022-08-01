@@ -19,12 +19,15 @@ class ItemSpec:
   actions = { }
 
   def __init__(self):
-    pairs = combinations(sys.argv[2:], 2)
-    for arg, val in pairs:
+    arg_pairs = self.pairs(sys.argv[2:])
+    for arg, val in arg_pairs:
       if re.match(r"^-{1,2}", arg):
         arg = arg.replace("-","")
         self.actions[arg] = val
     self.vars()
+
+  def pairs(self, args: list = []):
+    return [args[i*2:(i*2)+2] for i in range(len(args)-2)]
 
   def vars(self) -> None:
     for arg in self.actions:
@@ -48,10 +51,13 @@ class BoxSpec(ItemSpec):
     super().__init__()
 
   def use(self, **kwargs) -> None:
-    if action == "pack":
+    print(kwargs)
+    if kwargs["action"] == "pack":
       return
-    if action == "unpack":
-      return
+    if kwargs["action"] == "unpack":
+      items = kwargs["items"].split(",")
+      for item in items:
+        gitit.get(file_name=item.strip())
 
 class Factory:
 
