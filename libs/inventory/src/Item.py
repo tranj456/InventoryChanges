@@ -7,7 +7,6 @@ import argparse
 
 from .Config import *
 from .Template import Template
-from itertools import combinations
 
 sys.path.append(
   os.path.expanduser(f'{Config.values["INV_PATH"]}')
@@ -51,7 +50,6 @@ class BoxSpec(ItemSpec):
     super().__init__()
 
   def use(self, **kwargs) -> None:
-    print(kwargs)
     if kwargs["action"] == "pack":
       return
     if kwargs["action"] == "unpack":
