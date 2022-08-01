@@ -1,5 +1,6 @@
 import os
 import sys
+import gitit
 import inspect
 
 from .Config import *
@@ -24,6 +25,12 @@ class FixtureSpec(ItemSpec):
 class BoxSpec(ItemSpec):
 
   consumable = True
+
+  def use(self, *args):
+    if args[0] == "pack":
+      return
+    if args[0] == "unpack":
+      gitit.get(file_name=args[1])
 
 class Factory:
 
