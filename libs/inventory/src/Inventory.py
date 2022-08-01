@@ -1,6 +1,9 @@
 import os
 import sys
 import json
+import argparse
+
+from collections import namedtuple
 
 from .Config import *
 
@@ -130,17 +133,22 @@ class Items:
     return "BoxSpec" in dir(item)
 
   def use(self, item: str):
+    # Import necessary reflection module
     from importlib import import_module
 
+    # Set up properties and potential kwargs
     box = False
     fixture = False
+    args = sys.argv[2:]
 
+    # Verify that item is in path or inventory
     try:
       item_file = import_module(f"{item}")
     except ModuleNotFoundError:
       print(f"You don't seem to have any {item}.")
       return
 
+    # Test type of item; remove if ItemSpec
     try:
       fixture = self.is_fixture(item_file)
       if fixture:
@@ -157,12 +165,14 @@ class Items:
     except IsFixture as e:
       pass
 
+    # Reflect the class
     try:
       instance = getattr(item_file, item)()
     except:
       print(f"{item} doesn't seem to be a valid object.")
       return
 
+    # To or not to remove; that is the question
     if(instance.consumable and not box):
       list.remove(item)
       os.remove(
@@ -176,11 +186,12 @@ class Items:
         item_file.__file__
       )
 
+    # Return the result or inbuilt use method
     if type(instance).__str__ is not object.__str__:
-      instance.use()
+      instance.use(args)
       print(f"{instance}")
     else:
-      return instance.use()
+      return instance.use(args)
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this
