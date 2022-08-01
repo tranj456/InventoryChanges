@@ -14,7 +14,7 @@ class ItemSpec:
 
   consumable = True
 
-  def use(self) -> None:
+  def use(self, args) -> None:
     print(f"You try the {self.__module__}, but it doesn't do anything.")
     return None
 
@@ -26,7 +26,7 @@ class BoxSpec(ItemSpec):
 
   consumable = True
 
-  def use(self, *args):
+  def use(self, args):
     if args[0] == "pack":
       return
     if args[0] == "unpack":
