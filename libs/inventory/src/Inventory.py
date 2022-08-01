@@ -140,9 +140,6 @@ class Items:
     box = False
     fixture = False
 
-    # Grab command line arguments for CLI run
-    args = sys.argv[2:]
-
     # Verify that item is in path or inventory
     try:
       item_file = import_module(f"{item}")
@@ -182,10 +179,10 @@ class Items:
 
     # Return the result or inbuilt use method
     if type(instance).__str__ is not object.__str__:
-      instance.use(args)
+      instance.use(**instance.actions)
       print(f"{instance}")
     else:
-      return instance.use(args)
+      return instance.use(**instance.actions)
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this
