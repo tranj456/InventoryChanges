@@ -13,7 +13,10 @@ from .Item import IsFixture
 PATH = f'{Config.values["INV_PATH"]}/{Config.values["INV_REGISTRY"]}'
 
 sys.path.append(
-  os.path.expanduser(f'{Config.values["INV_PATH"]}')
+  [
+    os.path.expanduser(os.getcwd()),
+    os.path.expanduser(f'{Config.values["INV_PATH"]}')
+  ]
 )
 
 class Acquire:
@@ -128,6 +131,9 @@ class Items:
 
   def use(self, item: str):
     from importlib import import_module
+
+    box = False
+    fixture = False
 
     try:
       item_file = import_module(f"{item}")
