@@ -19,7 +19,6 @@ class ItemSpec:
 
   def __init__(self):
     arg_pairs = self.pairs(sys.argv)
-    print(sys.argv)
     for arg, val in arg_pairs:
       if re.match(r"^-{1,2}", arg):
         arg = arg.replace("-","")
