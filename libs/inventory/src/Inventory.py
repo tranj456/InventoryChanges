@@ -3,6 +3,8 @@ import sys
 import json
 import argparse
 
+from rich.table import Table
+from rich.console import Console
 from collections import namedtuple
 
 from .Config import *
@@ -120,6 +122,25 @@ class List:
         deletes.append(item)
     for item in deletes:
       del self.inventory[item]
+
+  # Create a nice(r) display
+
+  def display(self):
+    table = Table(title=f"{os.getenv('LOGNAME')}'s inventory")
+
+    table.add_column("Item name")
+    table.add_column("Item count")
+    table.add_column("Item file")
+
+    for item in self.inventory:
+      table.add_row(
+        item,
+        str(self.inventory[item]["quantity"]),
+        self.inventory[item]["filename"]
+      )
+
+    console = Console()
+    console.print(table)
 
 class Items:
 
