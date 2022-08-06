@@ -14,10 +14,12 @@ sys.path.append(
 
 class ItemSpec:
 
+  file = None
   consumable = True
   actions = { }
 
   def __init__(self):
+    self.file = f"{os.getcwd()}/{sys.argv[0]}"
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
       if re.match(r"^-{1,2}", arg):
@@ -34,6 +36,10 @@ class ItemSpec:
 
   def use(self, **kwargs) -> None:
     print(f"You try the {self.__module__}, but it doesn't do anything.")
+    if self.consumable:
+      os.remove(
+        self.file
+      )
 
 class FixtureSpec(ItemSpec):
 
@@ -56,6 +62,9 @@ class BoxSpec(ItemSpec):
       items = kwargs["items"].split(",")
       for item in items:
         gitit.get(file_name=item.strip())
+      os.remove(
+        self.file
+      )
 
 class Factory:
 

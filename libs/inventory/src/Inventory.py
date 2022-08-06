@@ -194,9 +194,10 @@ class Items:
       try:
         list.remove(item)
       except: pass
-      os.remove(
-        item_file.__file__
-      )
+      # File now removes at the Spec level
+      # os.remove(
+      #  item_file.__file__
+      # )
 
     # Return the result or inbuilt use method
     if type(instance).__str__ is not object.__str__:
