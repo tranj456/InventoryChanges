@@ -20,6 +20,7 @@ class ItemSpec:
 
   def __init__(self):
     filename = sys.argv[0] if not sys.argv[0] == "-c" else sys.argv[1]
+    filename = filename if filename.endswith(".py") else f"{filename}.py"
     self.file = f"{os.getcwd()}/{filename}"
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
