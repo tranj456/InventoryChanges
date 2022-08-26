@@ -18,10 +18,8 @@ class ItemSpec:
   consumable = True
   actions = { }
 
-  def __init__(self):
-    filename = sys.argv[0] if not sys.argv[0] == "-c" else sys.argv[1]
-    filename = filename if filename.endswith(".py") else f"{filename}.py"
-    self.file = f"{os.getcwd()}/{filename}"
+  def __init__(self,filename: str =""):
+    self.file = filename
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
       if re.match(r"^-{1,2}", arg):
