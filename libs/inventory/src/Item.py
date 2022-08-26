@@ -19,7 +19,8 @@ class ItemSpec:
   actions = { }
 
   def __init__(self):
-    self.file = f"{os.getcwd()}/{sys.argv[0]}"
+    filename = sys.argv[0] if not sys.argv[0] == "-c" else sys.argv[1]
+    self.file = f"{os.getcwd()}/{filename}"
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
       if re.match(r"^-{1,2}", arg):
