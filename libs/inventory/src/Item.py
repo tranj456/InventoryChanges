@@ -52,8 +52,8 @@ class BoxSpec(ItemSpec):
 
   consumable = True
 
-  def __init__(self):
-    super().__init__()
+  def __init__(self, filename: str = ""):
+    super().__init__(__file__)
 
   def use(self, **kwargs) -> None:
     if kwargs["action"] == "pack":
