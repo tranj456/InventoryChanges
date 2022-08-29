@@ -23,7 +23,9 @@ class Question:
 
   def ask(self) -> float:
     while True:
-      ask = input(self.prompt)
+      ask = lower(
+        input(self.prompt)
+      )
       if ask in self.responses:
         path = self.responses[ask].outcome
         self.choice = self.responses[ask].nice_name
