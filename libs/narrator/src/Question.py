@@ -23,9 +23,7 @@ class Question:
 
   def ask(self) -> float:
     while True:
-      ask = lower(
-        input(self.prompt)
-      )
+      ask = input(self.prompt).lower()
       if ask in self.responses:
         path = self.responses[ask].outcome
         self.choice = self.responses[ask].nice_name
@@ -54,4 +52,3 @@ class Option:
     )
     self.outcome = option["outcome"]
     self.nice_name = option["choice"].lower()
-
