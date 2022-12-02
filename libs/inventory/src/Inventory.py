@@ -231,10 +231,13 @@ class Items:
             return
 
     # To or not to remove; that is the question
-        if instance.consumable and number <= 0:
-            try:
-                list.remove(item)
-            except: pass
+
+    # edited so now the item can be used multiple times while still functioning
+    if instance.consumable and number <= 0:
+      try:
+        list.remove(item)
+      except: pass
+
       # File now removes at the Spec level
       # os.remove(
       #  item_file.__file__
