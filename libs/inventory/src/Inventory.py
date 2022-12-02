@@ -190,7 +190,9 @@ class Items:
       return
 
     # To or not to remove; that is the question
-    if instance.consumable:
+    
+    # edited so now the item can be uesd multiple times while still functioning
+    if instance.consumable and number <= 0:
       try:
         list.remove(item)
       except: pass
