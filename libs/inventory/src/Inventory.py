@@ -72,8 +72,6 @@ class Acquire:
 
 class List:
 
-  # File operations
-
   def __init__(self):
     self.inventory = {}
     try:
@@ -85,6 +83,27 @@ class List:
       fh.close()
     except: pass
 
+    
+  # stole from use function to determine if the object is a consumable
+  def determine_consumable(self, item):
+    
+    from importlib import import_module
+    
+    try:
+      item_file = import_module(f"{item}")
+    except ModuleNotFoundError:
+      print(f"You don't seem to have any {item}.")
+      return
+    
+    try:
+      instance = getattr(item_file, item)()
+    except:
+      print(f"{item} doesn't seem to be a valid object.")
+      return
+    
+    consumable = instance.consumable
+    return consumable
+    
   def write(self) -> None:
     self.empties()
     with open(
@@ -106,7 +125,8 @@ class List:
     else:
       self.inventory[item] = {
         "quantity": number,
-        "filename": f"{item}.py"
+        "filename": f"{item}.py",
+        "consumable": consumable
       }
     self.write()
 
@@ -125,18 +145,20 @@ class List:
 
   # Create a nice(r) display
 
-  def display(self):
+  def display(self):    
     table = Table(title=f"{os.getenv('LOGNAME')}'s inventory")
-
+    
     table.add_column("Item name")
     table.add_column("Item count")
     table.add_column("Item file")
-
+    table.add_column("Consumable")
+    
     for item in self.inventory:
       table.add_row(
         item,
         str(self.inventory[item]["quantity"]),
-        self.inventory[item]["filename"]
+        self.inventory[item]["filename"],
+        str(self.determine_consumable(item))
       )
 
     console = Console()

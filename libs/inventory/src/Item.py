@@ -18,7 +18,7 @@ class ItemSpec:
   consumable = True
   actions = { }
 
-  def __init__(self,filename: str =""):
+  def __init__(self, filename: str = ""):
     self.file = filename
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
