@@ -76,6 +76,7 @@ class List:
 
   def __init__(self):
     self.inventory = {}
+    self.path = os.path.expanduser(f'{Config.values["INV_PATH"]}')
     try:
       fh = open(
         os.path.expanduser(PATH),
@@ -142,29 +143,34 @@ class List:
 
     console = Console()
     console.print(table)
+  
+  # Returns a boolean whether the item object is a consumable
     
-  def determine_consumable(self, item):
+  def determine_consumable(self, item: str) -> bool:
     
-    from importlib import import_module
-    
+    from importlib import import_module   
     try:
       item_file = import_module(f"{item}")
     except ModuleNotFoundError:
-      print(f"You don't seem to have any {item}.")
+      #print(f"You don't seem to have any {item}.")
       return
-    
     try:
       instance = getattr(item_file, item)()
     except:
       print(f"{item} doesn't seem to be a valid object.")
-      return
-    
-    consumable = instance.consumable
-    return consumable
+      return 
+    return instace.consumable
+
+# Create instances to use as shorthand
+# I thought this was a bad idea, but this
+# is actually how the random module works
+
+# https://github.com/python/cpython/blob/main/Lib/random.py
 
 class Items:
 
     def __init__(self, list):
+        self.inv = list
         self.list = list.inventory
 
     def is_fixture(self, item) -> bool:
@@ -173,18 +179,18 @@ class Items:
     def is_box(self, item) -> bool:
         return "BoxSpec" in dir(item)
 
+    def file_exists(self, item) -> bool:
+        return os.path.exists(f"{self.inv.path}/{item}.py")
+
+    # Removes item from the list and is tied to the "remove" alias in .bashrc
+    
     def trash(self, item: str, rem_quantity: int = 1):
-        from importlib import import_module
-        try:
-            item_file = import_module(f"{item}")
-        except ModuleNotFoundError:
-            print(f"You don't seem to have any {item}.")
-            return
-        List.add(item, 0 - rem_quantity)
-        if self.list[item]["quantity"] <= 0:
-            try:
-                list.remove(item) 
-            except: pass
+        if rem_quantity == "":
+            rem_quantity = 1
+        if self.file_exists(item):
+            os.remove(f"{self.inv.path}/{item}.py")
+        list.add(item, 0 - int(rem_quantity))
+        list.empties()
     
     def use(self, item: str):
     # Import necessary reflection module
@@ -198,6 +204,7 @@ class Items:
         try:
             item_file = import_module(f"{item}")
         except ModuleNotFoundError:
+            self.inv.remove(item, -1000000000000)
             print(f"You don't seem to have any {item}.")
             return
 
@@ -208,6 +215,7 @@ class Items:
             if fixture or box:
                 raise IsFixture(item)
             number = self.list[item]["quantity"]
+            list.add(item, -1)
             if number <= 0:
                 raise OutOfError(item)
         except (KeyError, OutOfError) as e:
