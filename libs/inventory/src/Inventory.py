@@ -76,6 +76,7 @@ class List:
 
   def __init__(self):
     self.inventory = {}
+    self.path = os.path.expanduser(f'{Config.values["INV_PATH"]}')
     try:
       fh = open(
         os.path.expanduser(PATH),
@@ -131,82 +132,123 @@ class List:
     table.add_column("Item name")
     table.add_column("Item count")
     table.add_column("Item file")
-
+    table.add_column("Consumable")
     for item in self.inventory:
       table.add_row(
         item,
         str(self.inventory[item]["quantity"]),
-        self.inventory[item]["filename"]
+        self.inventory[item]["filename"],
+        str(self.determine_consumable(item))
       )
 
     console = Console()
     console.print(table)
-
-class Items:
-
-  def __init__(self, list):
-    self.list = list.inventory
-
-  def is_fixture(self, item) -> bool:
-    return "FixtureSpec" in dir(item)
-
-  def is_box(self, item) -> bool:
-    return "BoxSpec" in dir(item)
-
-  def use(self, item: str):
-    # Import necessary reflection module
-    from importlib import import_module
-
-    # Set up properties and potential kwargs
-    box = False
-    fixture = False
-
-    # Verify that item is in path or inventory
+  
+  # Returns a boolean whether the item object is a consumable
+    
+  def determine_consumable(self, item: str) -> bool:
+    
+    from importlib import import_module   
     try:
       item_file = import_module(f"{item}")
     except ModuleNotFoundError:
-      print(f"You don't seem to have any {item}.")
+      #print(f"You don't seem to have any {item}.")
       return
-
-    # Test type of item; remove if ItemSpec
-    try:
-      box = self.is_box(item_file)
-      fixture = self.is_fixture(item_file)
-      if fixture or box:
-        raise IsFixture(item)
-      number = self.list[item]["quantity"]
-      if number <= 0:
-        raise OutOfError(item)
-    except (KeyError, OutOfError) as e:
-      print(f"You have no {item} remaining!")
-      return
-    except IsFixture as e: pass
-
-    # Reflect the class
     try:
       instance = getattr(item_file, item)()
     except:
       print(f"{item} doesn't seem to be a valid object.")
-      return
+      return 
+    return instace.consumable
+
+# Create instances to use as shorthand
+# I thought this was a bad idea, but this
+# is actually how the random module works
+
+# https://github.com/python/cpython/blob/main/Lib/random.py
+
+class Items:
+
+    def __init__(self, list):
+        self.inv = list
+        self.list = list.inventory
+
+    def is_fixture(self, item) -> bool:
+        return "FixtureSpec" in dir(item)
+
+    def is_box(self, item) -> bool:
+        return "BoxSpec" in dir(item)
+
+    def file_exists(self, item) -> bool:
+        return os.path.exists(f"{self.inv.path}/{item}.py")
+
+    # Removes item from the list and is tied to the "remove" alias in .bashrc
+    
+    def trash(self, item: str, rem_quantity: int = 1):
+        if rem_quantity == "":
+            rem_quantity = 1
+        if self.file_exists(item):
+            os.remove(f"{self.inv.path}/{item}.py")
+        list.add(item, 0 - int(rem_quantity))
+        list.empties()
+    
+    def use(self, item: str):
+    # Import necessary reflection module
+        from importlib import import_module
+
+    # Set up properties and potential kwargs
+        box = False
+        fixture = False
+
+    # Verify that item is in path or inventory
+        try:
+            item_file = import_module(f"{item}")
+        except ModuleNotFoundError:
+            self.inv.remove(item, -1000000000000)
+            print(f"You don't seem to have any {item}.")
+            return
+
+    # Test type of item; remove if ItemSpec
+        try:
+            box = self.is_box(item_file)
+            fixture = self.is_fixture(item_file)
+            if fixture or box:
+                raise IsFixture(item)
+            number = self.list[item]["quantity"]
+            list.add(item, -1)
+            if number <= 0:
+                raise OutOfError(item)
+        except (KeyError, OutOfError) as e:
+            print(f"You have no {item} remaining!")
+            return
+        except IsFixture as e: pass
+
+    # Reflect the class
+        try:
+            instance = getattr(item_file, item)()
+        except:
+            print(f"{item} doesn't seem to be a valid object.")
+            return
 
     # To or not to remove; that is the question
-    
-    # edited so now the item can be uesd multiple times while still functioning
+
+    # edited so now the item can be used multiple times while still functioning
     if instance.consumable and number <= 0:
       try:
         list.remove(item)
       except: pass
+
       # File now removes at the Spec level
       # os.remove(
       #  item_file.__file__
       # )
 
     # Return the result or inbuilt use method
-    if type(instance).__str__ is not object.__str__:
-      instance.use(**instance.actions)
-      print(f"{instance}")
-    else:
-      return instance.use(**instance.actions)
+        if type(instance).__str__ is not object.__str__:
+            instance.use(**instance.actions)
+            print(f"{instance}")
+        else:
+            return instance.use(**instance.actions)
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this

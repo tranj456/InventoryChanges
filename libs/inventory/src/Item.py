@@ -15,10 +15,10 @@ sys.path.append(
 class ItemSpec:
 
   file = None
-  consumable = True
   actions = { }
+  consumable = True
 
-  def __init__(self,filename: str =""):
+  def __init__(self, filename: str =""):
     self.file = filename
     arg_pairs = self.pairs(sys.argv)
     for arg, val in arg_pairs:
@@ -36,7 +36,7 @@ class ItemSpec:
 
   def use(self, **kwargs) -> None:
     print(f"You try the {self.__module__}, but it doesn't do anything.")
-    if self.consumable:
+    if consumable:
       os.remove(
         self.file
       )
@@ -44,7 +44,7 @@ class ItemSpec:
 class FixtureSpec(ItemSpec):
 
   consumable = False
-
+  
   def __init__(self):
     super().__init__()
 
