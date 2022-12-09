@@ -66,6 +66,7 @@ class Acquire:
             exit()
 
     def add(self):
+        current_volume = list.total_volume + self.filename
         if MAX_VOLUME > list.total_volume():
             try:
                 list.add(self.name)
@@ -111,8 +112,8 @@ class List:
         
         total_volume = 0
         for item in self.inventory:
-            total_volume += int(self.inventory[item]["volume"]) * int(self.inventory[item]["quantity"])
-        print(total_volume)
+            if os.path.exists(f"{self.path}/{item}.py"): 
+                total_volume += int(self.inventory[item]["volume"]) * int(self.inventory[item]["quantity"])
         return total_volume
         
 
@@ -139,21 +140,35 @@ class List:
         for item in self.inventory:
             if self.inventory[item]["quantity"] <= 0:
                 deletes.append(item)
+            if not os.path.exists(f"{self.path}/{item}.py"): # added this to delete any items in the json file that does not have the associated .py file in .inv
+                deletes.append(item)
         for item in deletes:
             del self.inventory[item]
 
+    # Completely removes all items in .inv not listed in the .registry file       
+            
+    def nukeItems(self) -> None:
+        tempdict = {}
+        path = os.path.expanduser("~/.inv/")
+        for item in os.listdir(path):
+            if ".py" in item:
+                tempdict.update({item: "null"})
+            for element in self.inventory:
+                if f"{element}.py" in item:
+                    tempdict.pop(item)
+        for item in tempdict:
+            os.remove(os.path.expanduser(f"~/.inv/{item}")) # chose to use ~/.inv/ as the filepath to delete extraneous items
     # Create a nice(r) display
 
     def display(self):
         table = Table(title=f"{os.getenv('LOGNAME')}'s inventory")
-        
+        self.write() # This will make sure it loads in the proper file before adding columns. Also removes extra table items that don't exist in .inv from the .registry file.
+        self.nukeItems() # This removes any .py files from .inv that is not listed in the .registry file
         table.add_column("Item name")
         table.add_column("Item count")
         table.add_column("Item file")
         table.add_column("Consumable")
         table.add_column("Volume")
-        
-        self.total_volume()
         
         for item in self.inventory:
             table.add_row(
@@ -165,8 +180,9 @@ class List:
             )
 
         console = Console()
+        print("")
         console.print(table)
-  
+        print(f"Your current total volume limit is: {self.total_volume()}/{MAX_VOLUME}\n")
     # Returns a boolean whether the item object is a consumable
     
     def determine_consumable(self, item: str) -> list:
@@ -204,19 +220,19 @@ class Items:
 
     def file_exists(self, item) -> bool:
         return os.path.exists(f"{self.inv.path}/{item}.py")
+    
+    def registry_exists(self, item) -> bool:
+        for element in self.list:
+            if element == item:
+                return True
+        return False
+            
 
     # Removes item from the list and is tied to the "remove" alias in .bashrc
     
     def trash(self, item: str, rem_quantity: int = 1):
         if rem_quantity == "":
             rem_quantity = 1
-        if not self.file_exists(item):
-#             try:
-#                 os.remove(f"{self.inv.path}/{item}.py")
-#             except:
-            self.inv.pop(item)
-        elif self.file_exists(item) and self.inv[item]:
-            os.remove(f"{self.inv.path}/{item}.py")
         list.add(item, 0 - int(rem_quantity))
         list.empties()
     
@@ -232,9 +248,7 @@ class Items:
         try:
             item_file = import_module(f"{item}")
         except ModuleNotFoundError:
-            self.inv.remove(item, -1000000000000)
             print(f"You don't seem to have any {item}.")
-            return
 
         # Reflect the class
         try:
