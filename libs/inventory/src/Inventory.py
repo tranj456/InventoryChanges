@@ -64,10 +64,16 @@ class Acquire:
         except Exception as e:
             print(f"Couldn't acquire {self.name}")
             exit()
-
+            
     def add(self):
-        current_volume = list.total_volume + self.filename
-        if MAX_VOLUME > list.total_volume():
+        item = self.filename.replace(".py", "")
+        
+        item_volume = list.determine_consumable(item).VOLUME
+        
+#         item_volume = getattr(self.filename, item)()
+        
+        current_volume = list.total_volume() + item_volume
+        if MAX_VOLUME >= current_volume:
             try:
                 list.add(self.name)
             except Exception as e:
@@ -107,7 +113,7 @@ class List:
         return json.dumps(self.inventory)
 
     # Add/remove items
-
+    
     def total_volume(self):
         
         total_volume = 0
