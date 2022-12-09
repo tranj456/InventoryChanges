@@ -72,8 +72,12 @@ class Acquire:
 
 class List:
 
-  # File operations
+    # File operations
 
+    MAX_VOLUME = 5
+    
+    
+    
     def __init__(self):
         self.inventory = {}
         self.path = os.path.expanduser(f'{Config.values["INV_PATH"]}')
@@ -94,27 +98,35 @@ class List:
         ) as fh:
             json.dump(self.inventory, fh)
 
-  # Representation
+    # Representation
 
     def __str__(self) -> str:
         return json.dumps(self.inventory)
 
-  # Add/remove items
+    # Add/remove items
+
+    def total_volume(self):
+        for item in self.inventory:
+            total_volume += item.get("volume")
+        print(total_volume)
+        
 
     def add(self, item: str, number: int = 1) -> None:
+        
         if item in self.inventory:
             self.inventory[item]["quantity"] += number
         else:
             self.inventory[item] = {
                 "quantity": number,
-                "filename": f"{item}.py"
+                "filename": f"{item}.py",
+                "volume": self.determine_consumable(item).VOLUME
             }
         self.write()
 
     def remove(self, item: str, number: int = -1) -> None:
         self.add(item, number)
 
-  # Automatically remove empty or negative quantity items
+    # Automatically remove empty or negative quantity items
 
     def empties(self) -> None:
         deletes = []
@@ -124,29 +136,34 @@ class List:
         for item in deletes:
             del self.inventory[item]
 
-  # Create a nice(r) display
+    # Create a nice(r) display
 
     def display(self):
         table = Table(title=f"{os.getenv('LOGNAME')}'s inventory")
-
+        
         table.add_column("Item name")
         table.add_column("Item count")
         table.add_column("Item file")
         table.add_column("Consumable")
+        table.add_column("Volume")
+        
+        List.total_volume(self)
+        
         for item in self.inventory:
             table.add_row(
                 item,
                 str(self.inventory[item]["quantity"]),
                 self.inventory[item]["filename"],
-                str(self.determine_consumable(item))
+                str(self.determine_consumable(item).consumable),
+                str(self.determine_consumable(item).VOLUME)
             )
 
         console = Console()
         console.print(table)
   
-  # Returns a boolean whether the item object is a consumable
+    # Returns a boolean whether the item object is a consumable
     
-    def determine_consumable(self, item: str) -> bool:
+    def determine_consumable(self, item: str) -> list:
     
         from importlib import import_module   
         try:
@@ -159,7 +176,7 @@ class List:
         except:
             print(f"{item} doesn't seem to be a valid object.")
             return 
-        return instance.consumable
+        return instance
 
 # Create instances to use as shorthand
 # I thought this was a bad idea, but this
@@ -193,14 +210,14 @@ class Items:
         list.empties()
     
     def use(self, item: str):
-    # Import necessary reflection module
+        # Import necessary reflection module
         from importlib import import_module
 
-    # Set up properties and potential kwargs
+        # Set up properties and potential kwargs
         box = False
         fixture = False
 
-    # Verify that item is in path or inventory
+        # Verify that item is in path or inventory
         try:
             item_file = import_module(f"{item}")
         except ModuleNotFoundError:
@@ -215,13 +232,13 @@ class Items:
             print(f"{item} doesn't seem to be a valid object.")
             return
         
-    # Test type of item; remove if ItemSpec
+        # Test type of item; remove if ItemSpec
         try:
             box = self.is_box(item_file)
             fixture = self.is_fixture(item_file)
-            if fixture or box:
-                raise IsFixture(item)
             number = self.list[item]["quantity"]
+#             if fixture or box:
+#                 raise IsFixture(item)
             
             # only decreases quantity if it is a consumable
             if instance.consumable:
@@ -233,9 +250,9 @@ class Items:
             return
         except IsFixture as e: pass
 
-    # To or not to remove; that is the question
+        # To or not to remove; that is the question
 
-    # edited so now the item can be used multiple times while still functioning
+        # edited so now the item can be used multiple times while still functioning
         if instance.consumable and number <= 0:
             try:
                 list.remove(item)
@@ -246,7 +263,7 @@ class Items:
       #  item_file.__file__
       # )
 
-    # Return the result or inbuilt use method
+        # Return the result or inbuilt use method
         if type(instance).__str__ is not object.__str__:
             instance.use(**instance.actions)
             # print(f"{instance}")
