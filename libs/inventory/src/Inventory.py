@@ -31,8 +31,11 @@ class Acquire:
     import shutil
     import importlib
 
-    def __init__(self, filename):
+    def __init__(self, filename, quantity: int = 1):
         self.filename = filename
+        if quantity == "":
+            quantity = 1
+        self.quantity = int(quantity)
         self.validate()
         self.move()
         self.add()
@@ -68,19 +71,19 @@ class Acquire:
     def add(self):
         item = self.filename.replace(".py", "")
         
-        item_volume = list.determine_consumable(item).VOLUME
+        item_volume = list.determine_consumable(item).VOLUME * self.quantity
         
 #         item_volume = getattr(self.filename, item)()
         
         current_volume = list.total_volume() + item_volume
         if MAX_VOLUME >= current_volume:
             try:
-                list.add(self.name)
+                list.add(self.name, self.quantity)
             except Exception as e:
                 print(f"Couldn't acquire {self.name}")
                 exit()
         else:
-            print(f"Couldn't acquire {self.name}: Max Volume exceeded")
+            print(f"Couldn't acquire {self.quantity} {self.name}: Max Volume exceeded")
             exit()
 
 class List:
@@ -239,8 +242,11 @@ class Items:
     def trash(self, item: str, rem_quantity: int = 1):
         if rem_quantity == "":
             rem_quantity = 1
-        list.add(item, 0 - int(rem_quantity))
-        list.empties()
+        try:
+            list.add(item, 0 - int(rem_quantity))
+            list.empties()
+        except:
+            pass
     
     def use(self, item: str):
         # Import necessary reflection module
