@@ -24,7 +24,7 @@ sys.path.append(
   ]
 )
 
-MAX_VOLUME = 5
+MAX_VOLUME = 10
 
 class Acquire:
 
