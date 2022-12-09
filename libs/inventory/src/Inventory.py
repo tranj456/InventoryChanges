@@ -24,6 +24,8 @@ sys.path.append(
   ]
 )
 
+MAX_VOLUME = 5
+
 class Acquire:
 
     import shutil
@@ -64,19 +66,19 @@ class Acquire:
             exit()
 
     def add(self):
-        try:
-            list.add(self.name)
-        except Exception as e:
-            print(f"Couldn't acquire {self.name}")
+        if MAX_VOLUME > list.total_volume():
+            try:
+                list.add(self.name)
+            except Exception as e:
+                print(f"Couldn't acquire {self.name}")
+                exit()
+        else:
+            print(f"Couldn't acquire {self.name}: Max Volume exceeded")
             exit()
 
 class List:
 
     # File operations
-
-    MAX_VOLUME = 5
-    
-    
     
     def __init__(self):
         self.inventory = {}
@@ -106,20 +108,24 @@ class List:
     # Add/remove items
 
     def total_volume(self):
+        
+        total_volume = 0
         for item in self.inventory:
-            total_volume += item.get("volume")
+            total_volume += int(self.inventory[item]["volume"]) * int(self.inventory[item]["quantity"])
         print(total_volume)
+        return total_volume
         
 
     def add(self, item: str, number: int = 1) -> None:
         
         if item in self.inventory:
             self.inventory[item]["quantity"] += number
+            # self.inventory[item]["volume"] += volume
         else:
             self.inventory[item] = {
                 "quantity": number,
                 "filename": f"{item}.py",
-                "volume": self.determine_consumable(item).VOLUME
+                "volume": f"{self.determine_consumable(item).VOLUME}"
             }
         self.write()
 
@@ -147,7 +153,7 @@ class List:
         table.add_column("Consumable")
         table.add_column("Volume")
         
-        List.total_volume(self)
+        self.total_volume()
         
         for item in self.inventory:
             table.add_row(
@@ -155,7 +161,7 @@ class List:
                 str(self.inventory[item]["quantity"]),
                 self.inventory[item]["filename"],
                 str(self.determine_consumable(item).consumable),
-                str(self.determine_consumable(item).VOLUME)
+                str(self.determine_consumable(item).VOLUME * self.inventory[item]["quantity"])
             )
 
         console = Console()
@@ -204,7 +210,12 @@ class Items:
     def trash(self, item: str, rem_quantity: int = 1):
         if rem_quantity == "":
             rem_quantity = 1
-        if self.file_exists(item):
+        if not self.file_exists(item):
+#             try:
+#                 os.remove(f"{self.inv.path}/{item}.py")
+#             except:
+            self.inv.pop(item)
+        elif self.file_exists(item) and self.inv[item]:
             os.remove(f"{self.inv.path}/{item}.py")
         list.add(item, 0 - int(rem_quantity))
         list.empties()
