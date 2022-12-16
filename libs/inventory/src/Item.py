@@ -37,7 +37,7 @@ class ItemSpec:
 
     def use(self, **kwargs) -> None:
         print(f"You try the {self.__module__}, but it doesn't do anything.")
-        if consumable:
+        if ItemSpec.consumable:
             os.remove(
                 self.file
             )
